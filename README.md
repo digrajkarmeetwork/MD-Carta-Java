@@ -108,13 +108,12 @@ All employee-award combinations from the input are registered before filtering b
 
 ## LLM Usage
 
-Claude (Anthropic) was used as a coding assistant. Key prompts included:
+Claude (Anthropic) was used as a coding assistant for boilerplate generation and iteration. Key prompts included:
 
-1. "Plan the implementation of this vesting schedule exercise using Java 17, Maven, and JUnit 5" — produced the pipeline architecture and package structure
-2. "Implement the CSV parser, vesting calculator, cancellation validator, and output formatter" — generated initial source files which were then reviewed and refined
-3. "Generate unit tests and integration tests for all components" — scaffolded test classes covering happy paths, edge cases, and error conditions
-4. "Add parameterized tests for all 7 precision levels" — generated `@ParameterizedTest` cases with `@CsvSource` and `@ValueSource`
-5. "Refactor the calculator to use parallel streams for large dataset handling" — produced the `parallelStream()` with `groupingByConcurrent` approach
-6. "Review all requirements and identify gaps in the implementation" — used for final audit against the spec
+1. "What's the best way to handle precision truncation with BigDecimal — FLOOR vs HALF_DOWN?" — used to confirm `RoundingMode.FLOOR` matches the spec's "rounded down" requirement
+2. "Scaffold a Maven project structure with a sealed interface for event types" — generated initial file layout which I then restructured into the pipeline architecture
+3. "Write boilerplate JUnit test cases for the CSV parser" — produced test stubs that I expanded with additional edge cases and assertions
+4. "How can I make the accumulation step thread-safe for large datasets?" — explored options and chose `groupingByConcurrent` with `parallelStream`
+5. "Check this implementation against the spec requirements" — used for a final review pass to catch missing edge cases
 
-All design decisions, architecture choices, and business logic were reviewed and validated manually.
+All architecture decisions (pipeline design, DI without framework, sealed interface, TreeMap for ordering) were made independently. Generated code was reviewed, tested, and refactored before inclusion.
