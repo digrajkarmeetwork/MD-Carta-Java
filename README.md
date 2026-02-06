@@ -111,7 +111,7 @@ All employee-award combinations from the input are registered before filtering b
 Claude (Anthropic) was used as a coding assistant for boilerplate generation and iteration. Key prompts included:
 
 1. "What's the best way to handle precision truncation with BigDecimal — FLOOR vs HALF_DOWN?" — used to confirm `RoundingMode.FLOOR` matches the spec's "rounded down" requirement
-2. "Scaffold a Maven project structure with a sealed interface for event types" — generated initial file layout which I then restructured into the pipeline architecture
+2. "Generate the record classes and compact constructors for VestEvent and CancelEvent" — used to speed up Java record boilerplate with validation
 3. "Write boilerplate JUnit test cases for the CSV parser" — produced test stubs that I expanded with additional edge cases and assertions
 4. "How can I make the accumulation step thread-safe for large datasets?" — explored options and chose `groupingByConcurrent` with `parallelStream`
 5. "Does BigDecimal.FLOOR handle negative results correctly for cancellation subtraction?" — verified edge case behavior during manual testing
