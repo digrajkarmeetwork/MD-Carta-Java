@@ -1,0 +1,26 @@
+Hi Meet,
+
+Please take a moment to look over this email, the attached take home prep guide, and the attached exercise and let me know an estimated date of when you can return the completed exercise. Typically we like to see the exercise submitted in a couple of days. We understand if additional time is needed and can be flexible, so let me know if that is the case.
+
+Our goal with this take home exercise is to provide you with more insight into the actual work you would do here at Carta. So if you enjoy the problem that’s a great sign!
+
+ 
+Timing:
+
+This is not a timed exercise. It’s designed so that it can be completed in one sitting, but it doesn’t need to be. 
+On average, most candidates come to a working solution in about 2-3 hours. However, the amount of time you spend refining your solution to demonstrate your expertise is ultimately up to you.
+You’re also encouraged to use your readme to outline anything you would have expanded upon with additional time. 
+Language:
+
+You may choose to use any of the following languages: Java, Python, Go, Node, Rust, Scala, or C#. Please choose the language you are most proficient in, as you will be graded on correctness, maintainability, technique, and clarity.
+If you are not comfortable with the languages choices above, please reach out to your recruiter. 
+Leveling:
+
+Carta’s leveling process features a holistic review of your background, experience, and interview performance. Your take home submission will be considered as part of that.
+The take home is the only code we will collect from you during the process and a chance for you to put your best foot forward.
+Please reference Carta’s leveling guide for clarification on our structure.
+Submission:
+
+Submit your work to the link at the bottom of this email
+Submit your code as a zip file (no Github links, please!)
+Name your file with your initials and the language you used in the file name (eg. AB-Carta-Python.zip)

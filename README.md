@@ -1,0 +1,96 @@
+# Vesting Schedule Generator
+
+A command-line program that generates cumulative vesting schedules from individual vesting events.
+
+## Prerequisites
+
+- Java 17 or later
+- Maven 3.6+
+
+## Build
+
+```bash
+mvn clean package
+```
+
+This compiles the source, runs all tests, and produces an executable JAR at `target/vesting-program-1.0.0.jar`.
+
+## Run
+
+```bash
+# Unix/Mac
+./vesting_program <filename> <target_date> [precision]
+
+# Windows
+vesting_program.bat <filename> <target_date> [precision]
+
+# Direct JAR
+java -jar target/vesting-program-1.0.0.jar <filename> <target_date> [precision]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---|---|
+| `filename` | Yes | Path to CSV file containing vesting events |
+| `target_date` | Yes | Calculate shares vested on or before this date (YYYY-MM-DD) |
+| `precision` | No | Decimal digits for input/output (0-6, default: 0) |
+
+### Examples
+
+```bash
+java -jar target/vesting-program-1.0.0.jar events.csv 2020-04-01
+java -jar target/vesting-program-1.0.0.jar events.csv 2021-02-01 1
+```
+
+## Run Tests
+
+```bash
+mvn test
+```
+
+## Design Decisions
+
+### Architecture
+
+The application follows a pipeline architecture with four stages: **parse** -> **validate** -> **calculate** -> **format**. Each stage is encapsulated behind an interface, enabling independent testing and future extension.
+
+### Dependency Injection
+
+All components receive their dependencies through constructor injection without any framework. `VestingApp` composes `EventParser`, `VestingCalculator`, and `OutputFormatter` via their interfaces, making unit testing straightforward with alternative implementations.
+
+### Sealed Interface for Event Types
+
+`VestingEvent` is a sealed interface with `VestEvent` and `CancelEvent` as permitted implementations. This provides:
+- Compile-time exhaustiveness when switching on event types
+- Easy extensibility: adding a new event type requires a new record and updating the sealed clause
+- Immutability via Java records
+
+### BigDecimal for Precision
+
+All quantity arithmetic uses `BigDecimal` to avoid floating-point precision errors. The `PrecisionHandler` class applies truncation (`RoundingMode.FLOOR`) at two points:
+1. **Input**: Quantities are truncated to the specified precision when parsing the CSV
+2. **Output**: Final totals are truncated before formatting
+
+### Sorted Output via TreeMap
+
+`EmployeeAwardKey` implements `Comparable` with lexicographic ordering by Employee ID then Award ID. Using `TreeMap` with this key type guarantees output order without a separate sort step.
+
+### Zero-Share Inclusion
+
+All employee-award combinations from the input are registered before filtering by target date. This ensures employees with only future vesting events still appear in the output with 0 shares.
+
+## Assumptions
+
+- Employee IDs and Award IDs use consistent formatting (no mixed-case duplicates like "E001" vs "e001")
+- Employee names are consistent across all rows for the same employee-award combination
+- Input CSV lines use comma as the sole delimiter (no quoted fields containing commas)
+- An empty or blank CSV file produces no output and exits successfully
+
+## What I Would Change With More Time
+
+- Add streaming/chunked processing for very large files (current approach loads all events into memory)
+- Add more comprehensive error recovery (e.g., skip invalid lines with warnings instead of failing)
+- Add parameterized tests for precision edge cases across all 7 precision levels
+- Add a performance benchmark test with millions of events
+- Consider adding a `--help` flag for usage documentation
