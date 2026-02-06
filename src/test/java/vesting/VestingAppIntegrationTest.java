@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VestingAppIntegrationTest {
 
@@ -108,6 +109,48 @@ class VestingAppIntegrationTest {
                 "E001,Alice Smith,ISO-002,0",
                 "E002,Bobby Jones,NSO-001,0",
                 "E003,Cat Helms,NSO-002,0"
+        ) + "\n";
+
+        assertEquals(expected, output);
+    }
+
+    @Test
+    void sameDayVestAndMultipleCancels() {
+        // Vest 1000 on Jan 1, then vest 500 and cancel 200+100 on Jun 1
+        // Total: 1000 + 500 - 200 - 100 = 1200
+        String output = runApp("edge_same_day_cancel.csv", LocalDate.of(2020, 12, 31), 0);
+
+        assertEquals("E001,Alice Smith,ISO-001,1200\n", output);
+    }
+
+    @Test
+    void singleEvent() {
+        String output = runApp("edge_single_event.csv", LocalDate.of(2020, 12, 31), 0);
+
+        assertEquals("E001,Alice Smith,ISO-001,500\n", output);
+    }
+
+    @Test
+    void emptyFile_noOutput() {
+        String output = runApp("edge_empty.csv", LocalDate.of(2020, 12, 31), 0);
+
+        assertTrue(output.isEmpty(), "Empty CSV should produce no output");
+    }
+
+    @Test
+    void manyEmployeesAndAwards_withCancelsAndFutureEvents() {
+        // E001: ISO-001=100, ISO-002=200-50=150, ISO-003=300
+        // E002: NSO-001=400-400=0, NSO-002=500
+        // E003: RSU-001=0 (future event, 2025)
+        String output = runApp("edge_many_awards.csv", LocalDate.of(2020, 12, 31), 0);
+
+        String expected = String.join("\n",
+                "E001,Alice Smith,ISO-001,100",
+                "E001,Alice Smith,ISO-002,150",
+                "E001,Alice Smith,ISO-003,300",
+                "E002,Bobby Jones,NSO-001,0",
+                "E002,Bobby Jones,NSO-002,500",
+                "E003,Cat Helms,RSU-001,0"
         ) + "\n";
 
         assertEquals(expected, output);
