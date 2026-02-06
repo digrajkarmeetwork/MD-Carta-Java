@@ -8,32 +8,32 @@ A command-line program that generates cumulative vesting schedules from individu
 
 Maven is **not** required. The included Maven Wrapper (`mvnw`) handles it automatically.
 
+## Quick Start
+
+```bash
+./mvnw clean package
+./vesting_program <filename> <target_date> [precision]
+```
+
 ## Build
 
 ```bash
-# Unix/macOS
 ./mvnw clean package
-
-# Windows
-mvnw.cmd clean package
 ```
 
-This compiles the source, runs all tests, and produces an executable JAR at `target/vesting-program-1.0.0.jar`.
+This compiles the source, runs all tests, and produces an executable JAR. The Maven Wrapper automatically downloads Maven if not already present.
+
+On Windows CMD, use `mvnw.cmd clean package` instead.
 
 ## Run
 
-The wrapper scripts automatically build the project on first run if needed.
-
 ```bash
-# Unix/macOS
 ./vesting_program <filename> <target_date> [precision]
-
-# Windows
-vesting_program.bat <filename> <target_date> [precision]
-
-# Direct JAR (after building)
-java -jar target/vesting-program-1.0.0.jar <filename> <target_date> [precision]
 ```
+
+The script automatically builds the project on first run if needed.
+
+On Windows CMD, use `vesting_program.bat` instead.
 
 ### Arguments
 
@@ -46,18 +46,15 @@ java -jar target/vesting-program-1.0.0.jar <filename> <target_date> [precision]
 ### Examples
 
 ```bash
-./vesting_program events.csv 2020-04-01
-./vesting_program events.csv 2021-02-01 1
+./vesting_program example1.csv 2020-04-01
+./vesting_program example2.csv 2021-02-01
+./vesting_program example3.csv 2021-02-01 1
 ```
 
 ## Run Tests
 
 ```bash
-# Unix/macOS
 ./mvnw test
-
-# Windows
-mvnw.cmd test
 ```
 
 ## Design Decisions
