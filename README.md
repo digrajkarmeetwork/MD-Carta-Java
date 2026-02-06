@@ -108,12 +108,4 @@ All employee-award combinations from the input are registered before filtering b
 
 ## LLM Usage
 
-Claude (Anthropic) was used as a coding assistant for boilerplate generation and iteration. Key prompts included:
-
-1. "What's the best way to handle precision truncation with BigDecimal — FLOOR vs HALF_DOWN?" — used to confirm `RoundingMode.FLOOR` matches the spec's "rounded down" requirement
-2. "Generate the record classes and compact constructors for VestEvent and CancelEvent" — used to speed up Java record boilerplate with validation
-3. "Write boilerplate JUnit test cases for the CSV parser" — produced test stubs that I expanded with additional edge cases and assertions
-4. "How can I make the accumulation step thread-safe for large datasets?" — explored options and chose `groupingByConcurrent` with `parallelStream`
-5. "Does BigDecimal.FLOOR handle negative results correctly for cancellation subtraction?" — verified edge case behavior during manual testing
-
-All architecture decisions (pipeline design, DI without framework, sealed interface, TreeMap for ordering) were made independently. Generated code was reviewed, tested, and refactored before inclusion.
+Claude (Anthropic) was used as a coding assistant for generating boilerplate code (record classes, test stubs) and answering targeted questions about Java API behavior (e.g., `BigDecimal` rounding modes, `Collectors.groupingByConcurrent` thread safety). All architecture, design decisions, and business logic are my own.
