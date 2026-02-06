@@ -103,8 +103,8 @@ All employee-award combinations from the input are registered before filtering b
 
 - Add streaming/chunked parsing for very large files to reduce memory footprint
 - Add more comprehensive error recovery (e.g., skip invalid lines with warnings instead of failing)
-- Add a performance benchmark test with millions of events
-- Consider adding a `--help` flag for usage documentation
+- Support additional output formats (JSON, TSV) via the existing `OutputFormatter` interface
+- Add input consistency validation (e.g., detect conflicting employee names for the same Employee ID across rows)
 
 ## LLM Usage
 
