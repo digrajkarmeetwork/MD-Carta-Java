@@ -4,27 +4,34 @@ A command-line program that generates cumulative vesting schedules from individu
 
 ## Prerequisites
 
-- Java 17 or later
-- Maven 3.6+
+- Java 17 or later ([Download](https://adoptium.net/temurin/releases/))
+
+Maven is **not** required. The included Maven Wrapper (`mvnw`) handles it automatically.
 
 ## Build
 
 ```bash
-mvn clean package
+# Unix/macOS
+./mvnw clean package
+
+# Windows
+mvnw.cmd clean package
 ```
 
 This compiles the source, runs all tests, and produces an executable JAR at `target/vesting-program-1.0.0.jar`.
 
 ## Run
 
+The wrapper scripts automatically build the project on first run if needed.
+
 ```bash
-# Unix/Mac
+# Unix/macOS
 ./vesting_program <filename> <target_date> [precision]
 
 # Windows
 vesting_program.bat <filename> <target_date> [precision]
 
-# Direct JAR
+# Direct JAR (after building)
 java -jar target/vesting-program-1.0.0.jar <filename> <target_date> [precision]
 ```
 
@@ -39,14 +46,18 @@ java -jar target/vesting-program-1.0.0.jar <filename> <target_date> [precision]
 ### Examples
 
 ```bash
-java -jar target/vesting-program-1.0.0.jar events.csv 2020-04-01
-java -jar target/vesting-program-1.0.0.jar events.csv 2021-02-01 1
+./vesting_program events.csv 2020-04-01
+./vesting_program events.csv 2021-02-01 1
 ```
 
 ## Run Tests
 
 ```bash
-mvn test
+# Unix/macOS
+./mvnw test
+
+# Windows
+mvnw.cmd test
 ```
 
 ## Design Decisions
