@@ -114,6 +114,6 @@ Claude (Anthropic) was used as a coding assistant for boilerplate generation and
 2. "Scaffold a Maven project structure with a sealed interface for event types" — generated initial file layout which I then restructured into the pipeline architecture
 3. "Write boilerplate JUnit test cases for the CSV parser" — produced test stubs that I expanded with additional edge cases and assertions
 4. "How can I make the accumulation step thread-safe for large datasets?" — explored options and chose `groupingByConcurrent` with `parallelStream`
-5. "Check this implementation against the spec requirements" — used for a final review pass to catch missing edge cases
+5. "Does BigDecimal.FLOOR handle negative results correctly for cancellation subtraction?" — verified edge case behavior during manual testing
 
 All architecture decisions (pipeline design, DI without framework, sealed interface, TreeMap for ordering) were made independently. Generated code was reviewed, tested, and refactored before inclusion.
