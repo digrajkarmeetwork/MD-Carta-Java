@@ -108,4 +108,11 @@ All employee-award combinations from the input are registered before filtering b
 
 ## LLM Usage
 
-Claude (Anthropic) was used as a coding assistant for generating boilerplate code (record classes, test stubs) and answering targeted questions about Java API behavior (e.g., `BigDecimal` rounding modes, `Collectors.groupingByConcurrent` thread safety). All architecture, design decisions, and business logic are my own.
+Claude (Anthropic) was used as a coding assistant. Sample prompts:
+
+- "What rounding mode does BigDecimal use to truncate rather than round — FLOOR or DOWN?"
+- "Generate the VestEvent and CancelEvent record classes with null-check compact constructors"
+- "Write a JUnit 5 test class skeleton for CsvLineParser with edge cases for invalid input"
+- "Is groupingByConcurrent with parallelStream safe without external synchronization?"
+
+All architecture, design decisions, and business logic are my own. LLM output was reviewed and modified before use.
