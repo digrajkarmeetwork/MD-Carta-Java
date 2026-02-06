@@ -84,6 +84,10 @@ All quantity arithmetic uses `BigDecimal` to avoid floating-point precision erro
 
 `EmployeeAwardKey` implements `Comparable` with lexicographic ordering by Employee ID then Award ID. Using `TreeMap` with this key type guarantees output order without a separate sort step.
 
+### Parallel Accumulation for Large Datasets
+
+The calculation stage uses `parallelStream()` with `groupingByConcurrent` to accumulate vesting totals across employee-award keys. Each key's events are reduced independently, making the accumulation step thread-safe and scalable for large input files.
+
 ### Zero-Share Inclusion
 
 All employee-award combinations from the input are registered before filtering by target date. This ensures employees with only future vesting events still appear in the output with 0 shares.
@@ -97,8 +101,11 @@ All employee-award combinations from the input are registered before filtering b
 
 ## What I Would Change With More Time
 
-- Add streaming/chunked processing for very large files (current approach loads all events into memory)
+- Add streaming/chunked parsing for very large files to reduce memory footprint
 - Add more comprehensive error recovery (e.g., skip invalid lines with warnings instead of failing)
-- Add parameterized tests for precision edge cases across all 7 precision levels
 - Add a performance benchmark test with millions of events
 - Consider adding a `--help` flag for usage documentation
+
+## LLM Usage
+
+Claude (Anthropic) was used as a coding assistant during development for scaffolding the initial project structure, generating boilerplate test cases, and refining the README documentation. All design decisions, architecture choices, and business logic were reviewed and validated manually.

@@ -1,6 +1,9 @@
 package vesting.precision;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 
@@ -77,5 +80,47 @@ class PrecisionHandlerTest {
     void constructor_boundaryValues_valid() {
         new PrecisionHandler(0);
         new PrecisionHandler(6);
+    }
+
+    @ParameterizedTest(name = "precision {0}: truncate({1}) = {2}")
+    @CsvSource({
+            "0, 123.456789, 123",
+            "1, 123.456789, 123.4",
+            "2, 123.456789, 123.45",
+            "3, 123.456789, 123.456",
+            "4, 123.456789, 123.4567",
+            "5, 123.456789, 123.45678",
+            "6, 123.456789, 123.456789",
+    })
+    void truncate_allPrecisionLevels(int precision, String input, String expected) {
+        PrecisionHandler handler = new PrecisionHandler(precision);
+        assertEquals(new BigDecimal(expected), handler.truncate(new BigDecimal(input)));
+    }
+
+    @ParameterizedTest(name = "precision {0}: format({1}) = {2}")
+    @CsvSource({
+            "0, 500.999, 500",
+            "1, 500.999, 500.9",
+            "2, 500.999, 500.99",
+            "3, 500.999, 500.999",
+            "4, 500.999, 500.9990",
+            "5, 500.999, 500.99900",
+            "6, 500.999, 500.999000",
+    })
+    void format_allPrecisionLevels(int precision, String input, String expected) {
+        PrecisionHandler handler = new PrecisionHandler(precision);
+        assertEquals(expected, handler.format(new BigDecimal(input)));
+    }
+
+    @ParameterizedTest(name = "precision {0}: whole number 1000 formatted correctly")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+    void format_wholeNumber_allPrecisionLevels(int precision) {
+        PrecisionHandler handler = new PrecisionHandler(precision);
+        String result = handler.format(new BigDecimal("1000"));
+        if (precision == 0) {
+            assertEquals("1000", result);
+        } else {
+            assertEquals("1000." + "0".repeat(precision), result);
+        }
     }
 }

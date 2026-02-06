@@ -10,10 +10,11 @@ import vesting.validation.EventValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public final class CumulativeVestingCalculator implements VestingCalculator {
 
@@ -31,10 +32,13 @@ public final class CumulativeVestingCalculator implements VestingCalculator {
 
         // Register ALL employee-award combinations including future events.
         // TreeMap gives natural ordering by EmployeeAwardKey (Employee ID, then Award ID).
-        TreeMap<EmployeeAwardKey, String> employeeNames = new TreeMap<>();
-        for (VestingEvent event : events) {
-            employeeNames.put(event.key(), event.employeeName());
-        }
+        TreeMap<EmployeeAwardKey, String> employeeNames = events.stream()
+                .collect(Collectors.toMap(
+                        VestingEvent::key,
+                        VestingEvent::employeeName,
+                        (existing, replacement) -> replacement,
+                        TreeMap::new
+                ));
 
         // Filter to events on or before the target date.
         List<VestingEvent> applicableEvents = events.stream()
@@ -44,38 +48,40 @@ public final class CumulativeVestingCalculator implements VestingCalculator {
         // Validate cancellations against vested totals.
         validator.validate(applicableEvents);
 
-        // Accumulate totals per employee-award key.
-        Map<EmployeeAwardKey, BigDecimal> totals = new TreeMap<>();
-        for (EmployeeAwardKey key : employeeNames.keySet()) {
-            totals.put(key, BigDecimal.ZERO);
-        }
+        // Accumulate totals per employee-award key using parallel streams.
+        // Each key's events are reduced independently, enabling safe parallelism.
+        ConcurrentMap<EmployeeAwardKey, BigDecimal> accumulated = applicableEvents.parallelStream()
+                .collect(Collectors.groupingByConcurrent(
+                        VestingEvent::key,
+                        Collectors.reducing(BigDecimal.ZERO, e -> signedQuantity(e), BigDecimal::add)
+                ));
 
-        for (VestingEvent event : applicableEvents) {
-            BigDecimal current = totals.get(event.key());
-            BigDecimal updated;
-            if (event instanceof VestEvent) {
-                updated = current.add(event.quantity());
-            } else if (event instanceof CancelEvent) {
-                updated = current.subtract(event.quantity());
-            } else {
-                throw new IllegalStateException("Unknown event type: " + event.getClass());
-            }
-            totals.put(event.key(), updated);
-        }
+        // Merge into a sorted map, initializing all keys to zero first.
+        TreeMap<EmployeeAwardKey, BigDecimal> totals = new TreeMap<>();
+        employeeNames.keySet().forEach(key -> totals.put(key, BigDecimal.ZERO));
+        accumulated.forEach((key, value) -> totals.merge(key, value, BigDecimal::add));
 
         // Build output summaries with truncated values.
-        List<VestingSummary> summaries = new ArrayList<>();
-        for (Map.Entry<EmployeeAwardKey, BigDecimal> entry : totals.entrySet()) {
-            EmployeeAwardKey key = entry.getKey();
-            BigDecimal total = precisionHandler.truncate(entry.getValue());
-            summaries.add(new VestingSummary(
-                    key.employeeId(),
-                    employeeNames.get(key),
-                    key.awardId(),
-                    total
-            ));
-        }
+        return totals.entrySet().stream()
+                .map(entry -> {
+                    EmployeeAwardKey key = entry.getKey();
+                    BigDecimal total = precisionHandler.truncate(entry.getValue());
+                    return new VestingSummary(
+                            key.employeeId(),
+                            employeeNames.get(key),
+                            key.awardId(),
+                            total
+                    );
+                })
+                .toList();
+    }
 
-        return summaries;
+    private static BigDecimal signedQuantity(VestingEvent event) {
+        if (event instanceof VestEvent) {
+            return event.quantity();
+        } else if (event instanceof CancelEvent) {
+            return event.quantity().negate();
+        }
+        throw new IllegalStateException("Unknown event type: " + event.getClass());
     }
 }
